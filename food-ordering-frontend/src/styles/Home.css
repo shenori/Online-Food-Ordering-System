@@ -1,0 +1,60 @@
+/* Home Page Styles */
+
+.home-page {
+  display: flex;
+  gap: 30px;
+  padding: 20px;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.food-section {
+  flex: 1;
+}
+
+.category-filter {
+  background: white;
+  padding: 20px;
+  border-radius: 8px;
+  margin-bottom: 20px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.category-filter h3 {
+  margin-top: 0;
+  color: #333;
+}
+
+.category-filter button {
+  display: inline-block;
+  padding: 8px 15px;
+  margin-right: 10px;
+  margin-bottom: 10px;
+  background: #f0f0f0;
+  border: 1px solid #ddd;
+  border-radius: 20px;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.category-filter button.active {
+  background: #2196f3;
+  color: white;
+  border-color: #2196f3;
+}
+
+.category-filter button:hover {
+  border-color: #2196f3;
+}
+
+@media (max-width: 768px) {
+  .home-page {
+    flex-direction: column;
+  }
+
+  .cart-sidebar {
+    width: 100%;
+    position: relative;
+    top: 0;
+  }
+}
