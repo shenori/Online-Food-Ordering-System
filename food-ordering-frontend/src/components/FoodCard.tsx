@@ -1,19 +1,7 @@
-// Food Card Component
-// Displays individual food item
-
 import React, { useState } from 'react';
 import { useCart } from '../context/CartContext';
+import type { Food } from '../api/foodService';
 import '../styles/FoodCard.css';
-
-interface Food {
-  id: number;
-  name: string;
-  description: string;
-  price: number;
-  category: string;
-  image: string;
-  available: boolean;
-}
 
 interface FoodCardProps {
   food: Food;
@@ -27,24 +15,26 @@ export const FoodCard: React.FC<FoodCardProps> = ({ food }) => {
     if (quantity > 0) {
       addItem({
         id: food.id,
-        foodId: food.id,
+        foodItemId: food.id,
         foodName: food.name,
         price: food.price,
         quantity,
-        image: food.image,
       });
-      setQuantity(1); // Reset quantity
+      setQuantity(1);
     }
   };
 
+  const isAvailable = food.status === 'AVAILABLE';
+
   return (
     <div className="food-card">
-      <img src={food.image} alt={food.name} className="food-image" />
       <div className="food-info">
         <h3>{food.name}</h3>
         <p className="description">{food.description}</p>
-        <p className="category">{food.category}</p>
-        <p className="price">₹{food.price.toFixed(2)}</p>
+        <p className="price">Rs. {food.price.toFixed(2)}</p>
+        <span className={`status ${isAvailable ? 'available' : 'out-of-stock'}`}>
+          {isAvailable ? 'Available' : 'Out of Stock'}
+        </span>
         <div className="food-actions">
           <input
             type="number"
@@ -55,10 +45,10 @@ export const FoodCard: React.FC<FoodCardProps> = ({ food }) => {
           />
           <button
             onClick={handleAddToCart}
-            disabled={!food.available}
+            disabled={!isAvailable}
             className="add-btn"
           >
-            {food.available ? 'Add to Cart' : 'Out of Stock'}
+            {isAvailable ? 'Add to Cart' : 'Out of Stock'}
           </button>
         </div>
       </div>

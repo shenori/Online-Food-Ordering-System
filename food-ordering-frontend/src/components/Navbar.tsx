@@ -13,10 +13,8 @@ const Navbar = () => {
 
   return (
     <nav className="navbar navbar-expand-lg navbar-dark bg-dark px-4">
-      {/* Brand */}
       <Link className="navbar-brand fw-bold" to="/">🍔 FoodOrder</Link>
 
-      {/* Hamburger for mobile */}
       <button className="navbar-toggler" type="button"
         data-bs-toggle="collapse" data-bs-target="#navMenu">
         <span className="navbar-toggler-icon" />
@@ -24,35 +22,54 @@ const Navbar = () => {
 
       <div className="collapse navbar-collapse" id="navMenu">
         <ul className="navbar-nav me-auto">
-          {isAuthenticated && (
+          <li className="nav-item">
+            <Link className="nav-link" to="/">Home</Link>
+          </li>
+          {isAuthenticated && !isAdmin && (
             <>
               <li className="nav-item">
-                <Link className="nav-link" to="/">Home</Link>
+                <Link className="nav-link" to="/cart">🛒 Cart</Link>
               </li>
-              {isAdmin && (
-                <li className="nav-item">
-                  <Link className="nav-link" to="/admin/categories">
-                    Categories
-                  </Link>
-                </li>
-              )}
+              <li className="nav-item">
+                <Link className="nav-link" to="/order-history">My Orders</Link>
+              </li>
+            </>
+          )}
+          {isAdmin && (
+            <>
+              <li className="nav-item">
+                <Link className="nav-link" to="/admin/categories">Categories</Link>
+              </li>
+              <li className="nav-item">
+                <Link className="nav-link" to="/admin/foods">Foods</Link>
+              </li>
+              <li className="nav-item">
+                <Link className="nav-link" to="/admin/orders">Orders</Link>
+              </li>
+              <li className="nav-item">
+                <Link className="nav-link" to="/admin/users">Users</Link>
+              </li>
             </>
           )}
         </ul>
 
-        {/* Right side */}
         <ul className="navbar-nav">
           {isAuthenticated ? (
             <>
               <li className="nav-item d-flex align-items-center me-3">
                 <span className="text-light small">
                   👤 {user?.name}
-                  {isAdmin && <span className="badge bg-warning ms-2">Admin</span>}
+                  {isAdmin && (
+                    <span className="badge bg-warning ms-2">Admin</span>
+                  )}
                 </span>
               </li>
               <li className="nav-item">
-                <button className="btn btn-outline-danger btn-sm"
-                  onClick={handleLogout}>Logout</button>
+                <button
+                  className="btn btn-outline-danger btn-sm"
+                  onClick={handleLogout}>
+                  Logout
+                </button>
               </li>
             </>
           ) : (

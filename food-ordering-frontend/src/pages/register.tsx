@@ -1,9 +1,6 @@
-// Register Page
-// Connects to POST /api/auth/register with { name, email, password }
-
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import axios from '../api/axios';
+import api from '../api/axios';
 
 interface RegisterForm {
   name: string;
@@ -12,23 +9,14 @@ interface RegisterForm {
   confirmPassword: string;
 }
 
-interface ApiError {
-  message?: string;
-}
-
 const Register: React.FC = () => {
   const navigate = useNavigate();
-
   const [form, setForm] = useState<RegisterForm>({
-    name: '',
-    email: '',
-    password: '',
-    confirmPassword: '',
+    name: '', email: '', password: '', confirmPassword: '',
   });
-
-  const [error, setError] = useState<string>('');
-  const [loading, setLoading] = useState<boolean>(false);
-  const [success, setSuccess] = useState<boolean>(false);
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [success, setSuccess] = useState(false);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -36,25 +24,16 @@ const Register: React.FC = () => {
   };
 
   const validate = (): boolean => {
-    if (!form.name.trim()) {
-      setError('Name is required.');
-      return false;
-    }
-    if (!form.email.trim()) {
-      setError('Email is required.');
-      return false;
-    }
+    if (!form.name.trim()) { setError('Name is required.'); return false; }
+    if (!form.email.trim()) { setError('Email is required.'); return false; }
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) {
-      setError('Please enter a valid email address.');
-      return false;
+      setError('Please enter a valid email.'); return false;
     }
     if (form.password.length < 6) {
-      setError('Password must be at least 6 characters.');
-      return false;
+      setError('Password must be at least 6 characters.'); return false;
     }
     if (form.password !== form.confirmPassword) {
-      setError('Passwords do not match.');
-      return false;
+      setError('Passwords do not match.'); return false;
     }
     return true;
   };
@@ -62,125 +41,80 @@ const Register: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!validate()) return;
-
     setLoading(true);
     setError('');
-
     try {
-      await axios.post('/api/auth/register', {
+      await api.post('/auth/register', {
         name: form.name.trim(),
         email: form.email.trim(),
         password: form.password,
       });
-
       setSuccess(true);
       setTimeout(() => navigate('/login'), 2000);
-    } catch (err: unknown) {
-      const axiosErr = err as { response?: { data?: ApiError } };
-      setError(
-        axiosErr.response?.data?.message ||
-        'Registration failed. Please try again.'
-      );
+    } catch (err: any) {
+      setError(err?.response?.data?.error || 'Registration failed.');
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="register-page">
-      <div className="register-card">
-        <div className="register-header">
-          <h1>Create Account</h1>
-          <p>Join us and start ordering delicious food</p>
-        </div>
-
+    <div style={{ minHeight: '90vh', display: 'flex',
+      justifyContent: 'center', alignItems: 'center' }}>
+      <div style={{ width: '100%', maxWidth: '420px',
+        padding: '2rem', border: '1px solid #ddd', borderRadius: '8px' }}>
+        <h4 style={{ textAlign: 'center', marginBottom: '1.5rem' }}>
+          📝 Create Account
+        </h4>
         {success ? (
-          <div className="success-message">
-            <span className="success-icon">✓</span>
-            <p>Account created successfully!</p>
-            <p className="redirect-text">Redirecting to login...</p>
+          <div style={{ textAlign: 'center', color: 'green' }}>
+            <p>✅ Account created successfully!</p>
+            <p>Redirecting to login...</p>
           </div>
         ) : (
-          <form onSubmit={handleSubmit} className="register-form" noValidate>
+          <form onSubmit={handleSubmit}>
             {error && (
-              <div className="error-banner">
-                <span>⚠</span> {error}
+              <div style={{ background: '#fee', color: '#c00',
+                padding: '0.5rem', borderRadius: '4px', marginBottom: '1rem' }}>
+                {error}
               </div>
             )}
-
-            <div className="form-group">
-              <label htmlFor="name">Full Name</label>
-              <input
-                id="name"
-                type="text"
-                name="name"
-                value={form.name}
-                onChange={handleChange}
-                placeholder="John Doe"
-                autoComplete="name"
-                disabled={loading}
-              />
+            <div style={{ marginBottom: '1rem' }}>
+              <label>Full Name</label>
+              <input type="text" name="name"
+                style={{ width: '100%', padding: '0.5rem', marginTop: '0.25rem' }}
+                value={form.name} onChange={handleChange}
+                placeholder="John Doe" disabled={loading} />
             </div>
-
-            <div className="form-group">
-              <label htmlFor="email">Email Address</label>
-              <input
-                id="email"
-                type="email"
-                name="email"
-                value={form.email}
-                onChange={handleChange}
-                placeholder="john@example.com"
-                autoComplete="email"
-                disabled={loading}
-              />
+            <div style={{ marginBottom: '1rem' }}>
+              <label>Email</label>
+              <input type="email" name="email"
+                style={{ width: '100%', padding: '0.5rem', marginTop: '0.25rem' }}
+                value={form.email} onChange={handleChange}
+                placeholder="john@example.com" disabled={loading} />
             </div>
-
-            <div className="form-group">
-              <label htmlFor="password">Password</label>
-              <input
-                id="password"
-                type="password"
-                name="password"
-                value={form.password}
-                onChange={handleChange}
-                placeholder="Minimum 6 characters"
-                autoComplete="new-password"
-                disabled={loading}
-              />
+            <div style={{ marginBottom: '1rem' }}>
+              <label>Password</label>
+              <input type="password" name="password"
+                style={{ width: '100%', padding: '0.5rem', marginTop: '0.25rem' }}
+                value={form.password} onChange={handleChange}
+                placeholder="Minimum 6 characters" disabled={loading} />
             </div>
-
-            <div className="form-group">
-              <label htmlFor="confirmPassword">Confirm Password</label>
-              <input
-                id="confirmPassword"
-                type="password"
-                name="confirmPassword"
-                value={form.confirmPassword}
-                onChange={handleChange}
-                placeholder="Re-enter your password"
-                autoComplete="new-password"
-                disabled={loading}
-              />
+            <div style={{ marginBottom: '1rem' }}>
+              <label>Confirm Password</label>
+              <input type="password" name="confirmPassword"
+                style={{ width: '100%', padding: '0.5rem', marginTop: '0.25rem' }}
+                value={form.confirmPassword} onChange={handleChange}
+                placeholder="Re-enter password" disabled={loading} />
             </div>
-
-            <button
-              type="submit"
-              className="register-btn"
-              disabled={loading}
-            >
-              {loading ? (
-                <span className="btn-loading">
-                  <span className="spinner" /> Creating Account...
-                </span>
-              ) : (
-                'Create Account'
-              )}
+            <button type="submit" disabled={loading}
+              style={{ width: '100%', padding: '0.75rem',
+                background: '#28a745', color: 'white',
+                border: 'none', borderRadius: '4px', cursor: 'pointer' }}>
+              {loading ? 'Creating Account...' : 'Create Account'}
             </button>
-
-            <p className="login-link">
-              Already have an account?{' '}
-              <Link to="/login">Sign in here</Link>
+            <p style={{ textAlign: 'center', marginTop: '1rem' }}>
+              Already have an account? <Link to="/login">Sign in here</Link>
             </p>
           </form>
         )}

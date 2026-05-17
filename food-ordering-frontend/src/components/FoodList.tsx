@@ -1,6 +1,3 @@
-// Food List Component
-// Displays list of food items with filtering
-
 import React, { useEffect, useState } from 'react';
 import { foodService, type Food } from '../api/foodService';
 import { FoodCard } from './FoodCard';
@@ -20,9 +17,7 @@ export const FoodList: React.FC<FoodListProps> = ({ selectedCategory }) => {
       setLoading(true);
       setError(null);
       try {
-        const response = selectedCategory
-          ? await foodService.getFoodsByCategory(selectedCategory)
-          : await foodService.getAllFoods();
+        const response = await foodService.getAllFoods();
         setFoods(response.data);
       } catch (err) {
         setError('Failed to fetch foods');
@@ -31,7 +26,6 @@ export const FoodList: React.FC<FoodListProps> = ({ selectedCategory }) => {
         setLoading(false);
       }
     };
-
     fetchFoods();
   }, [selectedCategory]);
 

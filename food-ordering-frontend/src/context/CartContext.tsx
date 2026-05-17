@@ -1,15 +1,11 @@
-// Cart Context
-// Manages global cart state
-
 import React, { createContext, useContext, useState } from 'react';
 
 export interface CartItem {
   id: number;
-  foodId: number;
+  foodItemId: number;
   foodName: string;
   price: number;
   quantity: number;
-  image: string;
 }
 
 interface CartContextType {
@@ -30,10 +26,12 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const addItem = (item: CartItem) => {
     setItems((prevItems) => {
-      const existingItem = prevItems.find((i) => i.foodId === item.foodId);
+      const existingItem = prevItems.find((i) => i.foodItemId === item.foodItemId);
       if (existingItem) {
         return prevItems.map((i) =>
-          i.foodId === item.foodId ? { ...i, quantity: i.quantity + item.quantity } : i
+          i.foodItemId === item.foodItemId
+            ? { ...i, quantity: i.quantity + item.quantity }
+            : i
         );
       }
       return [...prevItems, item];
@@ -54,9 +52,7 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setItems((prevItems) => prevItems.filter((item) => item.id !== id));
   };
 
-  const clearCart = () => {
-    setItems([]);
-  };
+  const clearCart = () => setItems([]);
 
   return (
     <CartContext.Provider value={{ items, total, addItem, updateItem, removeItem, clearCart }}>
@@ -67,8 +63,6 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
 export const useCart = (): CartContextType => {
   const context = useContext(CartContext);
-  if (!context) {
-    throw new Error('useCart must be used within CartProvider');
-  }
+  if (!context) throw new Error('useCart must be used within CartProvider');
   return context;
 };

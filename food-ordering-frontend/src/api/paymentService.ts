@@ -1,41 +1,15 @@
-// Payment API Service
-// Handles all payment-related API calls
+import api from './axios';
 
-import axios from './axios';
-
-export interface PaymentRequest {
+export interface Payment {
+  id: number;
   orderId: number;
   amount: number;
-  paymentMethod: string; // CREDIT_CARD, DEBIT_CARD, UPI, WALLET
-  cardDetails?: CardDetails;
-}
-
-export interface CardDetails {
-  cardNumber: string;
-  expiryDate: string;
-  cvv: string;
-  cardholderName: string;
-}
-
-export interface PaymentResponse {
-  paymentId: number;
-  orderId: number;
-  status: 'SUCCESS' | 'FAILED' | 'PENDING';
-  amount: number;
-  transactionId?: string;
-  message: string;
+  status: string;
+  paymentDate: string;
 }
 
 export const paymentService = {
-  // Process payment
-  processPayment: (data: PaymentRequest) =>
-    axios.post<PaymentResponse>('/payments', data),
-
-  // Get payment status
-  getPaymentStatus: (paymentId: number) =>
-    axios.get<PaymentResponse>(`/payments/${paymentId}`),
-
-  // Get payment history
-  getPaymentHistory: () =>
-    axios.get('/payments/history'),
+  getPayment: (orderId: number) => api.get<Payment>(`/payments/${orderId}`),
+  completePayment: (orderId: number) =>
+    api.put<Payment>(`/payments/${orderId}/complete`),
 };

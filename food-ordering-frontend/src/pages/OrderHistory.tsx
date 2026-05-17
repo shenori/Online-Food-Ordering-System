@@ -1,10 +1,6 @@
-// Order History Page
-// Display user's previous orders
-
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { orderService, type Order } from '../api/orderService';
-import '../styles/OrderHistory.css';
 
 const OrderHistory: React.FC = () => {
   const navigate = useNavigate();
@@ -15,53 +11,66 @@ const OrderHistory: React.FC = () => {
   useEffect(() => {
     const fetchOrders = async () => {
       setLoading(true);
-      setError(null);
       try {
-        const response = await orderService.getUserOrders();
+        const response = await orderService.getMyOrders();
         setOrders(response.data);
-      } catch (err) {
+      } catch {
         setError('Failed to fetch orders');
-        console.error(err);
       } finally {
         setLoading(false);
       }
     };
-
     fetchOrders();
   }, []);
 
-  if (loading) return <div className="loading">Loading orders...</div>;
+  if (loading) return <div className="container mt-5">Loading orders...</div>;
 
   return (
-    <div className="order-history-page">
-      <h1>Order History</h1>
-      {error && <div className="error">{error}</div>}
+    <div className="container mt-4">
+      <h2>My Orders</h2>
+
+      {error && <div className="alert alert-danger">{error}</div>}
+
       {orders.length === 0 ? (
-        <div className="no-orders">
-          <p>You haven't placed any orders yet</p>
-          <button onClick={() => navigate('/')}>Start Shopping</button>
+        <div className="text-center mt-5">
+          <p>You haven't placed any orders yet.</p>
+          <button className="btn btn-primary" onClick={() => navigate('/')}>
+            Start Shopping
+          </button>
         </div>
       ) : (
-        <div className="orders-list">
+        <div>
           {orders.map((order) => (
-            <div key={order.id} className="order-card">
-              <div className="order-header">
-                <h3>Order #{order.id}</h3>
-                <span className={`status ${order.status.toLowerCase()}`}>{order.status}</span>
+            <div key={order.id} className="card mb-3 p-3">
+              <div className="d-flex justify-content-between align-items-center">
+                <h5>Order #{order.id}</h5>
+                <span className={`badge ${
+                  order.status === 'DELIVERED' ? 'bg-success' :
+                  order.status === 'CANCELLED' ? 'bg-danger' :
+                  order.status === 'PREPARING' ? 'bg-warning' : 'bg-primary'
+                }`}>
+                  {order.status}
+                </span>
               </div>
-              <p className="order-date">Date: {new Date(order.createdAt).toLocaleDateString()}</p>
-              <div className="order-items">
-                {order.items.map((item, idx) => (
-                  <p key={idx}>
-                    {item.foodName} x {item.quantity} = ₹{(item.price * item.quantity).toFixed(2)}
+              <p className="text-muted mb-1">
+                Date: {new Date(order.orderDate).toLocaleDateString()}
+              </p>
+              <div>
+                {order.orderItems.map((item, idx) => (
+                  <p key={idx} className="mb-0">
+                    {item.foodItemName} x {item.quantity} =
+                    Rs. {(item.price * item.quantity).toFixed(2)}
                   </p>
                 ))}
               </div>
-              <p className="order-total">Total: ₹{order.totalPrice.toFixed(2)}</p>
-              <p className="order-address">Delivery: {order.deliveryAddress}</p>
-              <button onClick={() => navigate(`/order-details/${order.id}`)} className="details-btn">
-                View Details
-              </button>
+              <div className="d-flex justify-content-between align-items-center mt-2">
+                <strong>Total: Rs. {order.totalAmount.toFixed(2)}</strong>
+                <button
+                  className="btn btn-outline-primary btn-sm"
+                  onClick={() => navigate(`/order/${order.id}`)}>
+                  View Details
+                </button>
+              </div>
             </div>
           ))}
         </div>
